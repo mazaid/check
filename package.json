@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "description": "mazaid check module",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "src"
+  ],
   "scripts": {
     "docs": "rm -rf ./docs && ./node_modules/.bin/jsdoc ./ -c ./.jsdoc.json --verbose && open ./docs/index.html",
     "tests": "./node_modules/.bin/mocha ./test/",
@@ -30,9 +34,10 @@
   "dependencies": {
     "joi": "^9.0.4",
     "lodash": "^4.15.0",
-    "mazaid-check-task": "^0.1.7",
+    "mazaid-check-task": "^0.1.8",
+    "mazaid-checker-ping": "^0.1.1",
     "mazaid-error": "^0.2.1",
-    "mazaid-exec-task": "^0.1.5"
+    "mazaid-exec-task": "^0.1.6"
   },
   "devDependencies": {
     "chai": "3.5.0",

@@ -33,6 +33,7 @@ describe('Check', function () {
                     data: {
                         host: 'github.com',
                         count: 2,
+                        interval: '0.5',
                         successResponseTimeLimit: 150
                     }
                 };
@@ -54,13 +55,26 @@ describe('Check', function () {
             })
             .then((execTask) => {
                 checkTask.started();
+
                 return exec(execTask);
             })
             .then((execTask) => {
+                console.log();
+
+                console.log(require('util').inspect(execTask, {depth: null}));
+
+                console.log();
+
                 return check.parse(checkTask, execTask);
             })
             .then((rawResult) => {
                 checkTask.rawResult = rawResult;
+
+                console.log();
+
+                console.log(require('util').inspect(checkTask, {depth: null}));
+
+                console.log();
 
                 return check.analyze(checkTask);
 
@@ -76,7 +90,8 @@ describe('Check', function () {
                 done();
             })
             .catch((error) => {
-                console.log(error);
+                checkTask.result = {status: 'fail', message: error.message};
+                console.log(checkTask);
                 done(error);
             });
 

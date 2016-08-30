@@ -31,6 +31,16 @@ module.exports = {
     parse: function (rawResult) {
 
         return new Promise((resolve, reject) => {
+            if (rawResult.code !== 0) {
+
+                if (!rawResult.error || !rawResult.error.message) {
+                    return reject(new Error('unknown error with exit code = ' + rawResult.code));
+                } else {
+                    return reject(new Error(rawResult.error.message));
+                }
+
+            }
+
             if (!rawResult.stdout) {
                 return reject(new Error('no stdout'));
             }

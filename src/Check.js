@@ -1,5 +1,7 @@
 'use strict';
 
+var vm = require('vm');
+
 var joi = require('joi');
 var _ = require('lodash');
 
@@ -8,11 +10,21 @@ var error = require('mazaid-error');
 var checkerSchema = require('./checkerSchema');
 
 var ErrorCodes = {
-    UNKNOWN_CHECKER: 'unknownChecker'
+    UNKNOWN_CHECKER: 'unknownChecker',
+    INVALID_CHECK_TASK: 'invalidCheckTask',
+    INVALID_EXEC_TASK: 'invalidExecTask'
 };
 
+/**
+ * @class
+ */
 class Check {
 
+    /**
+     * @constructor
+     * @param  {Log4js} logger
+     * @param  {Object} config
+     */
     constructor(logger, config) {
 
         this.ErrorCodes = ErrorCodes;
@@ -23,6 +35,11 @@ class Check {
         this._checkers = {};
     }
 
+    /**
+     * init
+     *
+     * @return {Promise}
+     */
     init() {
 
         return new Promise((resolve, reject) => {
@@ -31,6 +48,11 @@ class Check {
 
     }
 
+    /**
+     * add checker
+     *
+     * @param {object} checker
+     */
     add(checker) {
 
         return new Promise((resolve, reject) => {
@@ -49,6 +71,12 @@ class Check {
 
     }
 
+    /**
+     * get checker by name
+     *
+     * @param  {String} name
+     * @return {Null|Object}
+     */
     get(name) {
         if (typeof this._checkers[name] === 'undefined') {
             return null;
@@ -57,11 +85,21 @@ class Check {
         return this._checkers[name];
     }
 
+    /**
+     * prepare execTaskData
+     *
+     * @param  {Object} checkTask
+     * @return {Promise}
+     */
     prepare(checkTask) {
 
         return new Promise((resolve, reject) => {
 
             // TODO validate checkTask
+
+            if (typeof checkTask.isValid !== 'function') {
+                return reject(new Error('invalid check task object', ErrorCodes.INVALID_CHECK_TASK));
+            }
 
             var checker = this.get(checkTask.checker);
 
@@ -71,16 +109,20 @@ class Check {
                 );
             }
 
-            var checkData = checkTask.data;
+            var checkData = _.cloneDeep(checkTask.data);
 
             if (typeof checker.defaultData === 'object') {
                 checkData = _.defaultsDeep(checkData, checker.defaultData);
             }
 
-            // TODO use vm module
-            // TODO check promise returned
-            checker.prepare(checkData)
-                .then((execData) => {
+            var context = vm.createContext({
+                prepare: checker.prepare,
+                checkData: checkData,
+                callback: (error, execData) => {
+
+                    if (error) {
+                        return reject(error);
+                    }
 
                     var execTaskData = {
                         checkTaskId: checkTask.id,
@@ -89,15 +131,28 @@ class Check {
                     };
 
                     resolve(execTaskData);
-                })
-                .catch((error) => {
-                    reject(error);
-                });
+                }
+            });
+
+            var script = new vm.Script(`
+                prepare(checkData)
+                    .then((result) => {callback(null, result);})
+                    .catch((error) => {callback(error);});
+            `);
+
+            script.runInContext(context);
 
         });
 
     }
 
+    /**
+     * parse execTask result
+     *
+     * @param  {Object} checkTask
+     * @param  {Object} execTask
+     * @return {Promise}
+     */
     parse(checkTask, execTask) {
 
         return new Promise((resolve, reject) => {
@@ -111,21 +166,51 @@ class Check {
                 );
             }
 
-            // TODO use vm module
-            // TODO check promise returned
-            checker.parse(execTask.result)
-                .then((parsed) => {
-                    resolve(parsed);
-                })
-                .catch((error) => {
-                    reject(error);
-                });
+            if (execTask.type === 'exec') {
+                var rawResult = execTask.result;
 
+                if (rawResult.code !== 0) {
+
+                    if (!rawResult.error || !rawResult.error.message) {
+                        return reject(new Error('unknown error with exit code = ' + rawResult.code));
+                    } else {
+                        return reject(new Error(rawResult.error.message));
+                    }
+
+                }
+            }
+
+            var context = vm.createContext({
+                parse: checker.parse,
+                execTaskResult: _.cloneDeep(execTask.result),
+                callback: (error, parsed) => {
+
+                    if (error) {
+                        return reject(error);
+                    }
+
+                    resolve(parsed);
+                }
+            });
+
+            var script = new vm.Script(`
+                parse(execTaskResult)
+                    .then((result) => {callback(null, result);})
+                    .catch((error) => {callback(error);});
+            `);
+
+            script.runInContext(context);
 
         });
 
     }
 
+    /**
+     * analyze parsed result
+     *
+     * @param  {Object} checkTask
+     * @return {Promise}
+     */
     analyze(checkTask) {
 
         return new Promise((resolve, reject) => {
@@ -139,19 +224,38 @@ class Check {
                 );
             }
 
-            checker.analyze(checkTask.data, checkTask.rawResult)
-                .then((result) => {
+            var context = vm.createContext({
+                analyze: checker.analyze,
+                data: _.cloneDeep(checkTask.data),
+                rawResult: _.cloneDeep(checkTask.rawResult),
+                callback: (error, result) => {
+
+                    if (error) {
+                        return reject(error);
+                    }
+
                     resolve(result);
-                })
-                .catch((error) => {
-                    reject(error);
-                });
+                }
+            });
+
+            var script = new vm.Script(`
+                analyze(data, rawResult)
+                    .then((result) => {callback(null, result);})
+                    .catch((error) => {callback(error);});
+            `);
+
+            script.runInContext(context);
+
         });
 
     }
 
-
-
+    /**
+     * validate Checker object
+     *
+     * @param  {Object} checker
+     * @return {Promise}
+     */
     validateChecker(checker) {
 
         return new Promise((resolve, reject) => {
@@ -173,7 +277,6 @@ class Check {
         });
 
     }
-
 
 }
 

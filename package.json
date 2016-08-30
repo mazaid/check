@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mazaid/exec-task.git"
+    "url": "git+https://github.com/mazaid/check.git"
   },
   "keywords": [
     "mazaid"
@@ -28,9 +28,9 @@
   "author": "alekzonder <alekzonder@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mazaid/exec-task/issues"
+    "url": "https://github.com/mazaid/check/issues"
   },
-  "homepage": "https://github.com/mazaid/exec-task#readme",
+  "homepage": "https://github.com/mazaid/check#readme",
   "dependencies": {
     "joi": "^9.0.4",
     "lodash": "^4.15.0",

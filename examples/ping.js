@@ -24,7 +24,9 @@ initCheckApi()
                 count: 3,
                 interval: '0.5',
 
-                successResponseTimeLimit: 200
+                analyzer: {
+                    responseTimeLimit: 200
+                }
             }
         };
 

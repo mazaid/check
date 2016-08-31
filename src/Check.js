@@ -171,10 +171,10 @@ class Check {
 
                 if (rawResult.code !== 0) {
 
-                    if (!rawResult.error || !rawResult.error.message) {
-                        return reject(new Error('unknown error with exit code = ' + rawResult.code));
+                    if (rawResult.error) {
+                        return reject(new Error(rawResult.error));
                     } else {
-                        return reject(new Error(rawResult.error.message));
+                        return reject(new Error('unknown error with exit code = ' + rawResult.code));
                     }
 
                 }

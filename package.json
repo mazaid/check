@@ -1,6 +1,6 @@
 {
   "name": "mazaid-check",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "mazaid check module",
   "main": "index.js",
   "files": [

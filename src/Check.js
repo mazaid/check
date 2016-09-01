@@ -116,6 +116,7 @@ class Check {
             }
 
             var context = vm.createContext({
+                logger: this._logger,
                 prepare: checker.prepare,
                 checkData: checkData,
                 callback: (error, execData) => {
@@ -181,6 +182,7 @@ class Check {
             }
 
             var context = vm.createContext({
+                logger: this._logger,
                 parse: checker.parse,
                 execTaskResult: _.cloneDeep(execTask.result),
                 callback: (error, parsed) => {
@@ -225,6 +227,7 @@ class Check {
             }
 
             var context = vm.createContext({
+                logger: this._logger,
                 analyze: checker.analyze,
                 data: _.cloneDeep(checkTask.data),
                 rawResult: _.cloneDeep(checkTask.rawResult),

@@ -136,7 +136,7 @@ class Check {
             });
 
             var script = new vm.Script(`
-                prepare(checkData)
+                prepare(logger, checkData)
                     .then((result) => {callback(null, result);})
                     .catch((error) => {callback(error);});
             `);
@@ -196,7 +196,7 @@ class Check {
             });
 
             var script = new vm.Script(`
-                parse(execTaskResult)
+                parse(logger, execTaskResult)
                     .then((result) => {callback(null, result);})
                     .catch((error) => {callback(error);});
             `);
@@ -242,7 +242,7 @@ class Check {
             });
 
             var script = new vm.Script(`
-                analyze(data, rawResult)
+                analyze(logger, data, rawResult)
                     .then((result) => {callback(null, result);})
                     .catch((error) => {callback(error);});
             `);

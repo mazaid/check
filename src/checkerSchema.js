@@ -3,7 +3,7 @@ var joi = require('joi');
 module.exports = {
     name: joi.string().required(),
 
-    type: joi.string().valid(['exec']).required(),
+    type: joi.string().valid(['exec', 'http']).required(),
 
     defaultData: joi.any(),
 

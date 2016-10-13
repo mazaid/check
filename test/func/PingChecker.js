@@ -10,7 +10,7 @@ module.exports = {
         successResponseTimeLimit: 300
     },
 
-    prepare: function (data) {
+    prepare: function (logger, data) {
 
         return new Promise((resolve, reject) => {
             var args = [];
@@ -28,7 +28,7 @@ module.exports = {
 
     },
 
-    parse: function (rawResult) {
+    parse: function (logger, rawResult) {
 
         return new Promise((resolve, reject) => {
             if (rawResult.code !== 0) {
@@ -64,7 +64,7 @@ module.exports = {
 
     },
 
-    analyze: function (data, result) {
+    analyze: function (logger, data, result) {
 
         return new Promise((resolve, reject) => {
             if (!result) {

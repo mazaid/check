@@ -175,7 +175,9 @@ class Check {
                     if (rawResult.error) {
                         return reject(new Error(rawResult.error));
                     } else {
-                        return reject(new Error('unknown error with exit code = ' + rawResult.code));
+                        return reject(new Error(
+                            'unknown error with exit code = ' + rawResult.code
+                        ));
                     }
 
                 }
@@ -226,10 +228,16 @@ class Check {
                 );
             }
 
+            var checkData = _.cloneDeep(checkTask.data);
+
+            if (typeof checker.defaultData === 'object') {
+                checkData = _.defaultsDeep(checkData, checker.defaultData);
+            }
+
             var context = vm.createContext({
                 logger: this._logger,
                 analyze: checker.analyze,
-                data: _.cloneDeep(checkTask.data),
+                data: checkData,
                 rawResult: _.cloneDeep(checkTask.rawResult),
                 callback: (error, result) => {
 

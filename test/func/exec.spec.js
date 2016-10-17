@@ -14,6 +14,7 @@ describe('Check exec', function () {
     it('should success exec check task with ping checker', function (done) {
 
         var logger = log4js.getLogger('test');
+        logger.setLevel('ERROR');
 
         var config = {};
 

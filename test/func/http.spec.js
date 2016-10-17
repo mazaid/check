@@ -19,6 +19,7 @@ describe('Check http', function () {
     it('should success exec check task with http checker', function (done) {
 
         var logger = log4js.getLogger('test');
+        logger.setLevel('ERROR');
 
         var config = {};
 

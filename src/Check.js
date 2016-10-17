@@ -236,10 +236,16 @@ class Check {
 
             var context = vm.createContext({
                 logger: this._logger,
+
                 analyze: checker.analyze,
+
                 data: checkData,
-                rawResult: _.cloneDeep(checkTask.rawResult),
+
+                result: _.cloneDeep(checkTask.rawResult),
+
                 callback: (error, result) => {
+
+                    // TODO validate user code result
 
                     if (error) {
                         return reject(error);
@@ -249,13 +255,54 @@ class Check {
                 }
             });
 
-            var script = new vm.Script(`
-                analyze(logger, data, rawResult)
-                    .then((result) => {callback(null, result);})
-                    .catch((error) => {callback(error);});
-            `);
+            if (checkTask.userAnalyzeFn) {
+                this._logger.trace('using user code for analyze');
 
-            script.runInContext(context);
+                var script = new vm.Script(`
+
+                    var promise = new Promise(function(resolve, reject) {
+                        try {
+                            var status = null;
+
+                            ${checkTask.userAnalyzeFn}
+
+                            resolve(status);
+                        } catch(e) {
+                            reject(e);
+                        }
+                    });
+
+                    promise
+                        .then((status) => {callback(null, status);})
+                        .catch((error) => {callback(error);});
+                `);
+            } else {
+
+                this._logger.trace('using checker code for analyze');
+
+                var script = new vm.Script(`
+                    analyze(logger, data, result)
+                        .then((status) => {callback(null, status);})
+                        .catch((error) => {callback(error);});
+                `);
+            }
+
+            try {
+                var analyzeFnTimeout = 2000;
+
+                script.runInContext(context, {timeout: analyzeFnTimeout});
+
+            } catch (scriptError) {
+                if (scriptError.message === 'Script execution timed out.') {
+                    reject(
+                        new Error(`User analyze function execution timed out > ${analyzeFnTimeout}`)
+                    );
+                } else {
+                    reject(scriptError);
+                }
+            }
+
+
 
         });
 
@@ -268,6 +315,8 @@ class Check {
      * @return {Promise}
      */
     validateChecker(checker) {
+
+        this._logger.trace('validateChecker', checker);
 
         return new Promise((resolve, reject) => {
 

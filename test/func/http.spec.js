@@ -68,7 +68,7 @@ describe('Check http', function () {
                 // console.log(3);
                 checkTask.started();
 
-                return exec(execTask);
+                return exec(logger, execTask);
             })
             .then((execTask) => {
                 // console.log(4);

@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'base-http',
+    name: 'http',
 
     type: 'http',
 

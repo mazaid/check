@@ -35,10 +35,16 @@ describe('Check http', function () {
 
                 var raw = {
                     id: uuid(),
-                    checker: 'base-http',
+                    checker: 'http',
                     data: {
                         url: 'http://github.com'
-                    }
+                    },
+                    userAnalyzeFn: `
+                    status = {
+                        status: 'pass',
+                        message: 'this_from_user_analyze_fn'
+                    };
+                    `
                 };
 
                 checkTask = new CheckTask(raw);
@@ -78,6 +84,9 @@ describe('Check http', function () {
                 // console.log(result);
                 checkTask.result = result;
                 checkTask.finished();
+
+                assert.equal(result.status, 'pass');
+                assert.equal(result.message, 'this_from_user_analyze_fn');
 
                 return checkTask.validate();
             })

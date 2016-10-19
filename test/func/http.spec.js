@@ -40,10 +40,10 @@ describe('Check http', function () {
                         url: 'http://github.com'
                     },
                     userAnalyzeFn: `
-                    status = {
+                    resolve ({
                         status: 'pass',
                         message: 'this_from_user_analyze_fn'
-                    };
+                    });
                     `
                 };
 

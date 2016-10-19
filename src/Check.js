@@ -243,6 +243,10 @@ class Check {
 
                 result: _.cloneDeep(checkTask.rawResult),
 
+                setTimeout: setTimeout,
+
+                timeout: 2000,
+
                 libs: {
                     joi: require('joi'),
                     lodash: require('lodash'),
@@ -268,15 +272,24 @@ class Check {
 
                     var userAnalyzeFn = function userAnalyzeFn(logger, data, result, libs) {
 
-                        return new Promise(function(resolve) {
+                        return new Promise(function(resolve, __reject__) {
+
+                            setTimeout(function() {
+                                __reject__(new Error('[userAnalyzeFn] timeout exceed ' + timeout + 'ms'));
+                            }, timeout);
+
                             ${checkTask.userAnalyzeFn}
                         });
 
                     };
 
                     userAnalyzeFn(logger, data, result, libs)
-                        .then((status) => {callback(null, status);})
-                        .catch((error) => {callback(error);});
+                        .then((status) => {
+                            callback(null, status);
+                        })
+                        .catch((error) => {
+                            callback(error);
+                        });
                 `);
             } else {
 

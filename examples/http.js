@@ -43,7 +43,7 @@ initCheckApi(logger, config)
             'http://ngs.ru',
             'http://pogoda.ngs.ru',
             'http://n1.ru',
-            // 'http://github.com'
+            'http://github.com'
         ];
 
         var promises = [];

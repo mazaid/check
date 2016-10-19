@@ -235,13 +235,19 @@ class Check {
             }
 
             var context = vm.createContext({
-                logger: this._logger,
+                logger: this._logger.getLogger('analyze.' + checkTask.id),
 
                 analyze: checker.analyze,
 
                 data: checkData,
 
                 result: _.cloneDeep(checkTask.rawResult),
+
+                libs: {
+                    joi: require('joi'),
+                    lodash: require('lodash'),
+                    'simple-statistics': require('simple-statistics')
+                },
 
                 callback: (error, result) => {
 
@@ -260,19 +266,15 @@ class Check {
 
                 var script = new vm.Script(`
 
-                    var promise = new Promise(function(resolve, reject) {
-                        try {
-                            var status = null;
+                    var userAnalyzeFn = function userAnalyzeFn(logger, data, result, libs) {
 
+                        return new Promise(function(resolve) {
                             ${checkTask.userAnalyzeFn}
+                        });
 
-                            resolve(status);
-                        } catch(e) {
-                            reject(e);
-                        }
-                    });
+                    };
 
-                    promise
+                    userAnalyzeFn(logger, data, result, libs)
                         .then((status) => {callback(null, status);})
                         .catch((error) => {callback(error);});
                 `);

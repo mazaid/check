@@ -9,6 +9,8 @@ var Check = require(path.join(__dirname, '..', 'src', 'Check'));
 
 var exec = require('mazaid-exec');
 
+var logger = require('log4js-nested').getLogger();
+
 /**
  * init check api, add ping checker
  *
@@ -80,7 +82,7 @@ function runCheckTask(logger, checkTask) {
                 checkTask.started();
 
                 // execute exec task
-                return exec(execTask);
+                return exec(logger, execTask);
             })
             .then((execTask) => {
                 // got exec task response and parse it

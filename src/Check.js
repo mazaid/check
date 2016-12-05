@@ -25,7 +25,7 @@ class Check {
      * @param  {Log4js} logger
      * @param  {Object} config
      */
-    constructor(logger, config) {
+    constructor (logger, config) {
 
         this.ErrorCodes = ErrorCodes;
 
@@ -40,7 +40,7 @@ class Check {
      *
      * @return {Promise}
      */
-    init() {
+    init () {
 
         return new Promise((resolve, reject) => {
             resolve();
@@ -53,7 +53,7 @@ class Check {
      *
      * @param {object} checker
      */
-    add(checker) {
+    add (checker) {
 
         return new Promise((resolve, reject) => {
 
@@ -77,7 +77,7 @@ class Check {
      * @param  {String} name
      * @return {Null|Object}
      */
-    get(name) {
+    get (name) {
         if (typeof this._checkers[name] === 'undefined') {
             return null;
         }
@@ -91,7 +91,7 @@ class Check {
      * @param  {Object} checkTask
      * @return {Promise}
      */
-    prepare(checkTask) {
+    prepare (checkTask) {
 
         return new Promise((resolve, reject) => {
 
@@ -154,7 +154,7 @@ class Check {
      * @param  {Object} execTask
      * @return {Promise}
      */
-    parse(checkTask, execTask) {
+    parse (checkTask, execTask) {
 
         return new Promise((resolve, reject) => {
             // TODO use vm module
@@ -215,7 +215,7 @@ class Check {
      * @param  {Object} checkTask
      * @return {Promise}
      */
-    analyze(checkTask) {
+    analyze (checkTask) {
 
         return new Promise((resolve, reject) => {
             // TODO use vm module
@@ -329,7 +329,7 @@ class Check {
      * @param  {Object} checker
      * @return {Promise}
      */
-    validateChecker(checker) {
+    validateChecker (checker) {
 
         this._logger.trace('validateChecker', checker);
 

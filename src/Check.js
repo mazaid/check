@@ -167,6 +167,12 @@ class Check {
                 );
             }
 
+            var checkData = _.cloneDeep(checkTask.data);
+
+            if (typeof checker.defaultData === 'object') {
+                checkData = _.defaultsDeep(checkData, checker.defaultData);
+            }
+
             if (execTask.type === 'exec') {
                 var rawResult = execTask.result;
 
@@ -186,6 +192,7 @@ class Check {
             var context = vm.createContext({
                 logger: this._logger,
                 parse: checker.parse,
+                checkData: checkData,
                 execTaskResult: _.cloneDeep(execTask.result),
                 callback: (error, parsed) => {
 
@@ -198,7 +205,7 @@ class Check {
             });
 
             var script = new vm.Script(`
-                parse(logger, execTaskResult)
+                parse(logger, execTaskResult, checkData)
                     .then((result) => {callback(null, result);})
                     .catch((error) => {callback(error);});
             `);
